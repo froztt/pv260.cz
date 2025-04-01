@@ -1,9 +1,15 @@
+permissions:
+  pages: write
+  id-token: write
+  contents: read
+
 name: Deploy Blazor WebAssembly to GitHub Pages
 
 on:
   push:
     branches:
       - main  # Change this to your default branch if it's different
+
 
 jobs:
   build-and-deploy:
