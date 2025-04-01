@@ -1,54 +1,32 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+yaml name: Deploy Blazor WebAssembly to GitHub Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+    branches:
+      - main  # Change this to your default branch if it's different
 
 jobs:
-  runs-on: ubuntu-latest
-  steps:
-    # uses GitHub's checkout action to checkout code form the main branch
-    - uses: actions/checkout@v2
+  build-and-deploy:
+    runs-on: ubuntu-latest
 
-    # sets up .NET Core SDK 7.0.x
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 7.0.x
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    # Install dotnet wasm buildtools workload
-    - name: Install .NET WASM Build Tools
-      run: dotnet workload install wasm-tools
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '9.0.x'  # Change this to your target .NET version
 
-    # Publishes Blazor project to the release-folder
-    - name: Publish .NET Core Project
-      run: dotnet publish Portfolio/Portfolio.csproj -c:Release -p:GHPages=true -o dist/Web --nologo
+      - name: Restore dependencies
+        run: dotnet restore
 
-    # changes the base-tag in index.html from '/' to 'WebPortfolio' to match GitHub Pages repository subdirectory
-    - name: Change base-tag in index.html from / to WebPortfolio
-      run: sed -i 's/<base href="\/" \/>/<base href="\/WebPortfolio\/" \/>/g' release/wwwroot/index.html
+      - name: Build the project
+        run: dotnet publish -c Release -o output
 
-    #Publish static files to Github pages
-    - name: Commit wwwroot to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@3.7.1
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: gh-pages
-        FOLDER: dist/Web/wwwroot`
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./output/wwwroot
+          publish_branch: gh-pages  # The branch to deploy to
