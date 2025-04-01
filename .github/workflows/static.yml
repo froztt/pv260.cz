@@ -30,6 +30,14 @@ jobs:
       - name: Build the project
         run: dotnet publish -c Release -o output
 
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3.0.1
+        with:
+          # Artifact name
+      
+          # Path of the directory containing the static assets.
+          # Duration after which artifact will expire in days.
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
