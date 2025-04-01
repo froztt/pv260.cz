@@ -26,11 +26,18 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore
+      - name: Build and test
+        run: |
+          cd BlazorTest
+          dotnet build
+          dotnet test ../BlazorTest.Tests
 
       - name: Build the project
+        if: success()
         run: dotnet publish -c Release -o output
 
       - name: Upload GitHub Pages artifact
+        if: success()
         uses: actions/upload-pages-artifact@v3.0.1
         with:
           path: output/wwwroot
@@ -40,4 +47,5 @@ jobs:
           # Duration after which artifact will expire in days.
 
       - name: Deploy to GitHub Pages
+        if: success()
         uses: actions/deploy-pages@v4.0.5
